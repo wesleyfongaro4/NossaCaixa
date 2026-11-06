@@ -1,0 +1,31 @@
+# Nosso Caixa — GAS + Google Sheets (versão completa)
+
+## Estrutura
+- `Code.gs` — backend completo (Web App + CRUD + Google Sheets).
+- `Index.html` — **interface original integral**, adaptada para GAS (persistência via `google.script.run`).
+- Estilos e scripts estão embutidos na própria página (layout idêntico ao original).
+
+## Implantação
+1. Crie uma Planilha Google (ou deixe o script criar) chamada **Nosso Caixa**.
+2. Vá em **Extensões → Apps Script**.
+3. Crie os arquivos `Code.gs` e `Index.html` (cole os conteúdos deste pacote).
+4. (Opcional) Se desejar forçar um ID, preencha `SHEET_ID` em `Code.gs`.
+5. Implante como **Web App**:
+   - Executar como: **eu**
+   - Quem tem acesso: conforme sua preferência
+6. Abra a URL do Web App e autorize.
+
+## Como funciona
+- O app carrega toda a base ao abrir (`bootstrap()`).
+- Cada ação (lançamento, pagamento, edição, etc.) salva no Google Sheets e **recarrega a base** para manter a interface sincronizada.
+- A planilha usada é localizada pelo nome `Nosso Caixa` no seu Drive (ou ativa, se o script for vinculado).
+
+## Observações
+- Sem `window.claude`: usa a conta Google do usuário (`Session.getActiveUser()`).
+- Colunas complexas (ex.: cenários de projetos, extras, cfg) são salvas como JSON.
+- Para vários usuários no mesmo grupo, use os mecanismos de código de convite e membros já existentes no app.
+
+## Próximos ajustes opcionais
+- Adicionar formatação automática nas abas.
+- Otimizar para recarregar apenas a coleção afetada (hoje recarrega tudo — ok para bases familiares).
+- Configurar domínio/customização do Web App.

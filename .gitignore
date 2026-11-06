@@ -7,3 +7,8 @@ Thumbs.db
 # Ambientes de ferramentas locais (nao fazem parte do app)
 .skills/
 apex-matrix/
+
+# Credenciais/identificadores do clasp (por maquina, nunca no GitHub)
+.clasp.json
+.clasprc.json
+.clasprc.*
