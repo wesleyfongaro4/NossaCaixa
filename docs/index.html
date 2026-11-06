@@ -145,7 +145,7 @@ function normalizeRaw(raw){
    Nao usa google.script.run. Chama a URL do Web App e recebe
    uma resposta javascript: callback({...});
    ============================================================ */
-let NC_API_URL = ("").trim();
+let NC_API_URL = ("https://script.google.com/macros/s/AKfycbyHEthk6Rimjd639ahGI8ZwfkrX5kHffEmEhomUyh3oPcMu95yFUtwvU1ZkVaADxzqF4Q/exec").trim();
 if (NC_API_URL.charAt(0) === '<' || NC_API_URL.indexOf('ncApiUrl_') >= 0) NC_API_URL = '';
 
 function ncApiBase(){
@@ -780,12 +780,15 @@ function txList(m,canDel){
   return m.length?m.map(t=>`<div class="row"><span class="dot" style="background:${col(t.who)}"></span><div class="gg"><div class="t">${esc(t.desc||t.cat||'Acerto')}</div><div class="mut">${t.type==='ac'?'Acerto':esc(t.cat)} · ${esc(nm(t.who))} · ${(t.date||'').split('-').reverse().slice(0,2).join('/')} ${t.shared?'<span class="tag">dividido</span>':''}</div></div><b class="${t.type==='in'?'pos':t.type==='out'?'neg':''}">${t.type==='in'?'+':t.type==='out'?'−':''}${brl(t.amount)}</b>${canDel?delBtn('tx',t.id):''}</div>`).join(''):empty('Nada lançado neste mês.');
 }
 function vLanc(m){
-  return `<div class="card"><form class="f" data-f="tx"><select name="type" aria-label="Tipo"><option value="out"${S.pre==='out'?' selected':''}>Saída</option><option value="in"${S.pre==='in'?' selected':''}>Entrada</option></select>
+  const fontesUsadas=[...new Set(S.tx.map(t=>t.fonte).filter(x=>x))].slice(0,10).sort();
+  return `<div class="card"><form class="f" data-f="tx"><select name="type" aria-label="Tipo"><option value="out"${S.pre==='out'?' selected':''}>Saída</option><option value="in"${S.pre==='in'?' selected':''}>Entrada</option>
   <input name="amount" type="number" step="0.01" min="0.01" placeholder="Valor (R$)" required><select name="cat" aria-label="Categoria">${opts(ALLC)}</select><select name="who" aria-label="Quem">${whoOpts()}</select>
-  <input name="date" type="date" value="${today()}" required><input name="desc" placeholder="Descrição" maxlength="60"><label class="ck w"><input type="checkbox" name="shared"> Dividir entre nós (entra no acerto de contas)</label>
+  <input name="date" type="date" value="${today()}" required>
+  <input name="fonte" placeholder="Fonte (cartão/banco/dinheiro)" maxlength="30" list="fontesLanc"><datalist id="fontesLanc">${fontesUsadas.map(f=>'<option value="'+escapeHtml(f)+'">').join('')}</datalist>
+  <input name="desc" placeholder="Descrição" maxlength="60"><label class="ck w"><input type="checkbox" name="shared"> Dividir entre nós (entra no acerto de contas)</label>
   <button class="pri w">Adicionar</button></form></div><div class="card" style="margin-top:14px"><h3>${m.length} lançamento${m.length===1?'':'s'} no mês</h3>${txList(m,1)}</div>`;
-}
 const REC_L={unica:'Única',semanal:'Semanal',quinzenal:'Quinzenal',mensal:'Mensal',anual:'Anual',parcelada:'Parcelada',custom:'Personalizada'};
+
 const ST_L={pendente:'Pendente',proxima:'Próxima do vencimento',vence_hoje:'Vence hoje',atrasada:'Atrasada',paga:'Paga',cancelada:'Cancelada'};
 const PAYS=['Pix','Cartão de crédito','Débito automático','Boleto','Dinheiro','Transferência'];
 const REM=[[7,'7 dias antes'],[3,'3 dias antes'],[1,'1 dia antes'],[0,'No dia'],[-1,'Após vencer']];
@@ -1093,7 +1096,7 @@ document.addEventListener('submit',async e=>{
   if(sb){sb.disabled=true;sb.dataset.label=sb.textContent;sb.textContent='Salvando...'}
   const d=Object.fromEntries(new FormData(f));document.activeElement?.blur();
   try{
-    if(f.dataset.f==='tx'){await add('tx',{type:d.type,amount:+d.amount,cat:d.cat,who:d.who,shared:d.type==='out'&&!!d.shared,date:d.date,desc:d.desc.trim(),ts:Date.now()});S.pre=d.type}
+    if(f.dataset.f==='tx'){await add('tx',{type:d.type,amount:+d.amount,cat:d.cat,who:d.who,shared:d.type==='out'&&!!d.shared,date:d.date,desc:d.desc.trim(),fonte:d.fonte?.trim()||'',ts:Date.now()});S.pre=d.type}
     else if(f.dataset.f==='conta'){const e=S.contas.find(c=>c.id===S.edit),base={name:d.name.trim(),cat:d.cat,amount:+d.amount,who:d.who,pay:d.pay,notes:d.notes.trim(),shared:!!d.shared},sch=e&&!Core.canEditSchedule(e,S.pagamentos)?{}:{due:d.due,rec:d.rec,n:Math.max(1,Math.floor(+d.n||1)),every:Math.max(1,Math.floor(+d.every||1)),unit:d.unit};if(e){await upd('contas',e.id,{...base,...sch});S.edit=null;toast('Conta atualizada')}else{await add('contas',{...base,...sch,canceledFrom:null,created:Date.now()});toast('Conta cadastrada')}}
     else if(f.dataset.f==='projeto'){const nn=k=>d[k]===''||d[k]===undefined?null:+d[k],tx=nn('taxa'),n=nn('n'),card=d.cardId||'',tar=nn('tarifas')||0,cen=[{tipo:'vista',tarifas:tar}];
       if(n)cen.push({tipo:'parcelado',n:Math.floor(n),taxa:tx,parcela:nn('parcela'),cardId:card,tarifas:tar});
