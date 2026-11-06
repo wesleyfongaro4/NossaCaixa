@@ -3,13 +3,13 @@
  * a partir de Index.html (template do GAS).
  *
  * Uso:
- *   node scripts/build-pages.mjs              → gera com NC_API_URL = '' (o app pede a URL uma vez, salva no localStorage)
+ *   node scripts/build-pages.mjs              → gera com NC_API_URL = '' (o app pede a URL uma vez)
  *   node scripts/build-pages.mjs <url /exec>  → gera com a URL fixada (cuidado: fica visível no repo público)
  */
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-const root = fileURLToPath(new URL('..', import.meta.url));
+const root = 'C:/nossoCaixa/';
 const src = readFileSync(root + 'Index.html', 'utf8');
 const dst = root + 'docs/index.html';
 
@@ -21,13 +21,13 @@ if (baked && !/\/exec$/.test(baked)) {
 }
 
 let out = src.replace(SCRIPTLET, 'let NC_API_URL = (' + JSON.stringify(baked) + ').trim();');
-const fixado = out !== src;
-if (!fixado) {
+const fixed = out !== src;
+if (!fixed) {
   console.error('Scriptlet do GAS não encontrado — nada foi alterado.');
   process.exit(1);
 }
 
-// Guarda de segurança: mesmo com URL fixada, mantém comportamento de template fora do GAS
+// Normalizar line endings e salvar
 mkdirSync(root + 'docs', { recursive: true });
-writeFileSync(dst, out, 'utf8');
+writeFileSync(dst, out.replace(/\r\n/g, '\n'), 'utf8');
 console.log('docs/index.html gerado' + (baked ? ' com URL fixada: ' + baked : ' sem URL fixada (o app pede no primeiro acesso)'));
