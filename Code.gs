@@ -22,7 +22,7 @@ var NC_PROP = 'NC_SHEET_ID';
 var COLLECTIONS = ['tx','goals','contas','pagamentos','avisos','recebimentos','cartoes','compras','faturas','projetos','membros','perfis','cfg'];
 
 var SCHEMA = {
-  tx: ['id','esp','type','amount','cat','who','shared','date','desc','comp','ts'],
+  tx: ['id','esp','type','amount','cat','who','shared','date','desc','comp','ts','fonte'],
   goals: ['id','esp','name','target','saved','deadline'],
   contas: ['id','esp','name','cat','amount','who','pay','notes','shared','due','rec','n','every','unit','canceledFrom','created'],
   pagamentos: ['id','esp','billId','comp','paidOn','amount','who','cat','name','pay','shared'],
