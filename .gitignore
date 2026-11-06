@@ -1,0 +1,9 @@
+# Windows cruft
+desktop.ini
+Thumbs.db
+*.tmp
+~$*
+
+# Ambientes de ferramentas locais (nao fazem parte do app)
+.skills/
+apex-matrix/
